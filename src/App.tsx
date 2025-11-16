@@ -32,6 +32,7 @@ import Community from './pages/Community';
 import Sem4 from './pages/sam_4';
 import Attendance from './pages/Attendance';
 import ClassManagement from './pages/ClassManagement';
+import ViewAttendance from './pages/ViewAttendance';
   const queryClient = new QueryClient();
 
   const SessionRedirectHandler = () => {
@@ -128,6 +129,7 @@ import ClassManagement from './pages/ClassManagement';
             <Route path="/sem_4" element={<Sem4 />} /> {/* Added route for Semester 4 */}
             <Route path="/attendance" element={<FacultyRoute><Attendance /></FacultyRoute>} />
             <Route path="/class-management" element={<AdminRoute><ClassManagement /></AdminRoute>} />
+            <Route path="/view-attendance" element={<ViewAttendance />} />
             <Route path="/data-analysis" element={<AdminRoute><DataAnalysis /></AdminRoute>} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />

@@ -88,7 +88,10 @@ const Header = () => {
           <Link to="/resources" className="px-3 py-2 text-sm font-medium hover:text-campusblue-500 rounded-md hover:bg-campusblue-50 dark:hover:bg-campusblue-900/20 transition-colors">Resources</Link>
           <Link to="/events" className="px-3 py-2 text-sm font-medium hover:text-campusblue-500 rounded-md hover:bg-campusblue-50 dark:hover:bg-campusblue-900/20 transition-colors">Events</Link>
           {userData?.role === 'faculty' && (
-            <Link to="/attendance" className="px-3 py-2 text-sm font-medium hover:text-campusblue-500 rounded-md hover:bg-campusblue-50 dark:hover:bg-campusblue-900/20 transition-colors">Attendance</Link>
+            <Link to="/attendance" className="px-3 py-2 text-sm font-medium hover:text-campusblue-500 rounded-md hover:bg-campusblue-50 dark:hover:bg-campusblue-900/20 transition-colors">Mark Attendance</Link>
+          )}
+          {userData?.role === 'student' && (
+            <Link to="/view-attendance" className="px-3 py-2 text-sm font-medium hover:text-campusblue-500 rounded-md hover:bg-campusblue-50 dark:hover:bg-campusblue-900/20 transition-colors">My Attendance</Link>
           )}
           {userData?.role === 'admin' && (
             <>

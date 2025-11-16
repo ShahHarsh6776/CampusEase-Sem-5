@@ -19,12 +19,12 @@ END $$;
 
 -- Update existing students to have account_activated = false (they will use default passwords)
 UPDATE public.student_records 
-SET account_activated = false 
+SET account_activated = false, email_verified = true
 WHERE account_activated IS NULL;
 
 -- Update existing students who already have auth_id to be activated
 UPDATE public.student_records 
-SET account_activated = true 
+SET account_activated = true, email_verified = true
 WHERE auth_id IS NOT NULL;
 
 -- Update the student record with proper data
