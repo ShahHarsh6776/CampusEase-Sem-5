@@ -19,6 +19,7 @@ import {
 } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useToast } from '@/hooks/use-toast';
+import MassFaceRecognitionComponent from '@/components/MassFaceRecognitionComponent';
 import { 
   Calendar,
   Users,
@@ -28,7 +29,8 @@ import {
   Save,
   Search,
   Download,
-  GraduationCap
+  GraduationCap,
+  Zap
 } from 'lucide-react';
 
 interface ClassDetail {
@@ -101,6 +103,7 @@ const Attendance: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState('mark');
   const [departmentFilter, setDepartmentFilter] = useState('all');
+  const [showFaceRecognition, setShowFaceRecognition] = useState(false);
 
   // Predefined subjects and class types
   const subjects = [
@@ -564,6 +567,41 @@ const Attendance: React.FC = () => {
     return { present, absent, late, total: attendance.length };
   };
 
+  const handleFaceRecognitionResults = (results: any[]) => {
+    // Convert face recognition results to attendance records
+    const attendanceRecords = results.map(result => {
+      const student = students.find(s => s.user_id === result.student_id);
+      return {
+        user_id: result.student_id,
+        class_id: selectedClass?.class_id || '',
+        student_name: result.student_name,
+        roll_no: student?.roll_no || '',
+        department: student?.department || selectedClass?.department || '',
+        date: selectedDate,
+        subject: selectedSubject,
+        class_type: selectedClassType,
+        status: result.status,
+        marked_by: userData?.user_id || '',
+        faculty_name: `${userData?.fname || ''} ${userData?.lname || ''}`.trim() || 'Faculty',
+        face_recognition_confidence: result.confidence,
+        marked_via: result.confidence > 0 ? 'face_recognition' : 'manual',
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      };
+    });
+
+    // Update the attendance state
+    setAttendance(attendanceRecords);
+    
+    // Close the face recognition modal
+    setShowFaceRecognition(false);
+    
+    toast({
+      title: "Face Recognition Complete",
+      description: `Processed ${results.length} students. Review and save the attendance.`,
+    });
+  };
+
   const fetchAttendanceHistory = async () => {
     try {
       const { data, error } = await supabase
@@ -820,6 +858,15 @@ const Attendance: React.FC = () => {
                     {/* Quick Actions */}
                     <div className="flex flex-wrap gap-4 pt-4 border-t">
                       <Button
+                        onClick={() => setShowFaceRecognition(true)}
+                        variant="outline"
+                        disabled={!selectedSubject || !selectedClassType}
+                        className="bg-blue-50 hover:bg-blue-100"
+                      >
+                        <Zap className="h-4 w-4 mr-2 text-blue-600" />
+                        Smart Face Recognition
+                      </Button>
+                      <Button
                         onClick={markAllPresent}
                         variant="outline"
                         disabled={!selectedSubject || !selectedClassType}
@@ -1066,6 +1113,25 @@ const Attendance: React.FC = () => {
           </TabsContent>
         </Tabs>
       </main>
+
+      {/* Face Recognition Modal */}
+      {showFaceRecognition && selectedClass && selectedSubject && selectedClassType && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg max-w-6xl max-h-[90vh] overflow-auto">
+            <MassFaceRecognitionComponent
+              classId={selectedClass.class_id}
+              className={selectedClass.class_name}
+              subject={selectedSubject}
+              classType={selectedClassType}
+              date={selectedDate}
+              facultyId={userData?.user_id || ''}
+              facultyName={`${userData?.fname || ''} ${userData?.lname || ''}`.trim() || 'Faculty'}
+              onAttendanceSaved={handleFaceRecognitionResults}
+              onClose={() => setShowFaceRecognition(false)}
+            />
+          </div>
+        </div>
+      )}
 
       <Footer />
     </div>

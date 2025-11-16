@@ -51,8 +51,10 @@ import {
   Eye,
   UserPlus,
   School,
-  FileSpreadsheet
+  FileSpreadsheet,
+  Camera
 } from 'lucide-react';
+import FaceUploadComponent from '@/components/FaceUploadComponent';
 
 interface ClassDetail {
   id: string;
@@ -127,6 +129,9 @@ const ClassManagement: React.FC = () => {
   // Excel import state
   const [isImportOpen, setIsImportOpen] = useState(false);
   const [importFile, setImportFile] = useState<File | null>(null);
+
+  // Face training state
+  const [faceTrainingStudent, setFaceTrainingStudent] = useState<StudentDetail | null>(null);
 
   const departments = ['IT', 'CE', 'CS', 'DIT', 'DCE', 'DCS'];
   const institutes = ['CSPIT', 'DEPSTAR'];
@@ -624,6 +629,14 @@ const ClassManagement: React.FC = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleFaceTrainingComplete = () => {
+    setFaceTrainingStudent(null);
+    toast({
+      title: "Success",
+      description: "Face training completed successfully!",
+    });
   };
 
   const downloadSampleCSV = () => {
@@ -1430,6 +1443,15 @@ const ClassManagement: React.FC = () => {
                               <Edit className="h-4 w-4 mr-1" />
                               Edit
                             </Button>
+                            <Button 
+                              size="sm" 
+                              variant="outline" 
+                              className="text-blue-600 hover:text-blue-700"
+                              onClick={() => setFaceTrainingStudent(student)}
+                            >
+                              <Camera className="h-4 w-4 mr-1" />
+                              Train Face
+                            </Button>
                             <AlertDialog>
                               <AlertDialogTrigger asChild>
                                 <Button size="sm" variant="outline" className="text-red-600">
@@ -1559,6 +1581,32 @@ const ClassManagement: React.FC = () => {
                           Update Student
                         </Button>
                       </div>
+                    </div>
+                  </DialogContent>
+                </Dialog>
+
+                {/* Face Training Dialog */}
+                <Dialog open={!!faceTrainingStudent} onOpenChange={() => setFaceTrainingStudent(null)}>
+                  <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+                    <DialogHeader>
+                      <DialogTitle className="flex items-center gap-2">
+                        <Camera className="h-5 w-5" />
+                        Train Face Recognition for {faceTrainingStudent?.fname} {faceTrainingStudent?.lname}
+                      </DialogTitle>
+                      <DialogDescription>
+                        Upload training photos for {faceTrainingStudent?.fname} {faceTrainingStudent?.lname} (ID: {faceTrainingStudent?.roll_no}) to enable face recognition in attendance marking.
+                      </DialogDescription>
+                    </DialogHeader>
+                    <div className="mt-4">
+                      {faceTrainingStudent && (
+                        <FaceUploadComponent
+                          studentId={faceTrainingStudent.roll_no}
+                          studentName={`${faceTrainingStudent.fname} ${faceTrainingStudent.lname}`}
+                          department={selectedClass ? `${selectedClass.institute} ${selectedClass.department}` : faceTrainingStudent.course_taken}
+                          onTrainingComplete={handleFaceTrainingComplete}
+                          showUploadOption={true}
+                        />
+                      )}
                     </div>
                   </DialogContent>
                 </Dialog>

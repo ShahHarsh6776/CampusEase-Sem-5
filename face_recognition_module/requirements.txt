@@ -1,0 +1,57 @@
+# Face Recognition Module Requirements with Supabase Integration
+# Install these dependencies in your campus management system environment
+
+# Core dependencies
+fastapi>=0.100.0
+uvicorn>=0.18.0
+opencv-python>=4.7.0
+numpy>=1.21.0
+pillow>=8.3.0
+
+# AI/ML dependencies  
+insightface>=0.7.0
+onnxruntime-gpu>=1.15.0  # GPU acceleration
+scikit-learn>=1.0.0
+
+# Supabase and Database dependencies
+supabase>=2.0.0          # Supabase Python client
+postgrest>=0.10.0        # PostgreSQL REST API client  
+python-dotenv>=0.19.0    # For environment variables
+asyncpg>=0.28.0          # Async PostgreSQL driver
+
+# Alternative Database dependencies (choose based on your system)
+sqlalchemy>=1.4.0        # ORM (optional)
+alembic>=1.8.0           # Database migrations (optional)
+pymysql>=1.0.0           # For MySQL (optional)
+psycopg2-binary>=2.9.0   # For direct PostgreSQL (optional)
+
+# Utilities
+python-multipart>=0.0.6  # For file uploads
+python-jose>=3.3.0       # For JWT authentication
+passlib>=1.7.4           # For password hashing
+pydantic>=1.10.0         # Data validation
+aiofiles>=0.8.0          # Async file operations
+
+# Monitoring and logging
+loguru>=0.6.0            # Enhanced logging
+prometheus-client>=0.14.0 # Metrics collection
+psutil>=5.9.0            # System monitoring
+
+# GPU monitoring
+pynvml>=11.4.0           # NVIDIA GPU monitoring
+GPUtil>=1.4.0            # GPU utilities
+
+# Image processing
+imageio>=2.19.0          # Image I/O
+matplotlib>=3.5.0        # Plotting and visualization
+
+# Optional: For advanced features
+redis>=4.3.0             # Caching (optional)
+celery>=5.2.0            # Background tasks (optional)
+flower>=1.2.0            # Celery monitoring (optional)
+
+# Development and testing (optional)
+pytest>=7.0.0            # Testing framework
+pytest-asyncio>=0.21.0   # Async testing
+black>=22.0.0            # Code formatting
+flake8>=4.0.0            # Code linting

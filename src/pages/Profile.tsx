@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useUser } from '../UserContext';
+import FaceTrainingStatus from '@/components/FaceTrainingStatus';
 import { 
   User, 
   Mail, 
@@ -31,6 +32,7 @@ const Profile = () => {
   console.log(userData);
 
   const [editing, setEditing] = useState(false);
+  const [studentDepartment, setStudentDepartment] = useState<string | null>(null);
   const { toast } = useToast();
 
   const [editedData, setEditedData] = useState({
@@ -56,6 +58,44 @@ const Profile = () => {
     const year = studentId.substring(0, 2);
     return `${studentId}@${year}`;
   };
+
+  // Fetch student's class information to get department
+  useEffect(() => {
+    const fetchStudentDepartment = async () => {
+      if (userData?.role === 'student' && userData?.user_id) {
+        try {
+          // Get student's class information
+          const { data: studentData, error: studentError } = await supabase
+            .from('student_records')
+            .select('class_id, course_taken')
+            .eq('user_id', userData.user_id)
+            .single();
+
+          if (studentData?.class_id) {
+            // Get class details to find department
+            const { data: classData, error: classError } = await supabase
+              .from('class_details')
+              .select('department, institute')
+              .eq('class_id', studentData.class_id)
+              .single();
+
+            if (classData) {
+              const departmentInfo = `${classData.institute} ${classData.department}`;
+              setStudentDepartment(departmentInfo);
+            }
+          }
+        } catch (error) {
+          console.error('Error fetching student department:', error);
+          // Fallback to course_taken if available
+          if (userData.course_taken) {
+            setStudentDepartment(userData.course_taken);
+          }
+        }
+      }
+    };
+
+    fetchStudentDepartment();
+  }, [userData]);
 
   const navigate = useNavigate();
 
@@ -441,6 +481,7 @@ const handleLogout = async () => {
             <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="academics">Academics</TabsTrigger>
             <TabsTrigger value="documents">Documents</TabsTrigger>
+            <TabsTrigger value="face-recognition">Face Recognition</TabsTrigger>
             <TabsTrigger value="settings">Settings</TabsTrigger>
           </TabsList>
           
@@ -1045,6 +1086,56 @@ const handleLogout = async () => {
                         </div>
                       </div>
                     </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
+          
+          {/* Face Recognition Tab */}
+          <TabsContent value="face-recognition">
+            <div className="space-y-6">
+              <FaceTrainingStatus
+                studentId={userData?.user_id || ''}
+                studentName={`${userData?.fname || ''} ${userData?.lname || ''}`.trim()}
+                department={studentDepartment || userData?.course_taken || 'Unknown'}
+                showUploadOption={true}
+              />
+              
+              {/* Additional Information */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg">About Face Recognition</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="bg-blue-50 p-4 rounded-lg">
+                    <h3 className="font-medium text-blue-900 mb-2">How it works:</h3>
+                    <ul className="text-sm text-blue-800 space-y-2">
+                      <li>• Upload 2-5 clear photos of your face</li>
+                      <li>• AI processes your photos to create a unique face signature</li>
+                      <li>• Faculty can use class photos for automatic attendance marking</li>
+                      <li>• Your photos are processed securely and stored encrypted</li>
+                    </ul>
+                  </div>
+                  
+                  <div className="bg-green-50 p-4 rounded-lg">
+                    <h3 className="font-medium text-green-900 mb-2">Benefits:</h3>
+                    <ul className="text-sm text-green-800 space-y-2">
+                      <li>• No need to manually mark attendance in every class</li>
+                      <li>• Faster attendance process for faculty</li>
+                      <li>• More accurate attendance records</li>
+                      <li>• Reduces chances of proxy attendance</li>
+                    </ul>
+                  </div>
+                  
+                  <div className="bg-amber-50 p-4 rounded-lg">
+                    <h3 className="font-medium text-amber-900 mb-2">Photo Guidelines:</h3>
+                    <ul className="text-sm text-amber-800 space-y-2">
+                      <li>• Clear, front-facing photos with good lighting</li>
+                      <li>• No sunglasses, masks, or face coverings</li>
+                      <li>• Include different angles and expressions</li>
+                      <li>• File size should be less than 10MB each</li>
+                    </ul>
                   </div>
                 </CardContent>
               </Card>
